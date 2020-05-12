@@ -6,11 +6,68 @@ and open the template in the editor.
 -->
 <html>
     <head>
-        <title>TODO supply a title</title>
+        <title>Chat - POO</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body>
-        <div>TODO write content</div>
+        Nome:
+        <input id="nome" type="text"/>
+        <br>
+        Destinatário:
+        <select id="destino">
+            <option></option>
+        </select>
+        <div id="chat" style="height:300px; overflow:scroll; border:1px solid black"></div>
+        <input id="texto" type="text"/>
+        <input id="btenviar" type="button" value="Enviar"/>
+        
+        
+        <script>
+            var socket = new WebSocket("ws://localhost:8080/Chat/endpoint");
+            var sessoes = {};
+            socket.onopen = function (event) {
+            };
+            socket.onmessage = function (event) {
+              console.log("recebeu: "+event.data);
+              var obj = JSON.parse(event.data)
+              console.log(obj)
+              if(obj.mensagem!==undefined){
+                document.getElementById("chat").innerHTML+=obj.remetente+": "+ obj.mensagem+"<br>"
+              }else{
+                  var listaDestino = document.getElementById("destino");
+                  listaDestino.innerHTML="<option />"
+                  for (let id in obj.sessoes) {
+                      console.log(obj.sessoes[id])
+                      var option = document.createElement("option");
+                        option.text = obj.sessoes[id];
+                        option.value = obj.sessoes[id];
+                      listaDestino.add(option);
+                  }
+              }
+            }
+            socket.onerror=function (event) {
+              console.log("erro "+JSON.stringify(event));
+            }
+            socket.onclose=function (event) {
+              console.log("fechado");
+            }
+
+            document.getElementById("btenviar").onclick=function enviar(){
+              var obj = {};
+              obj.remetente = document.getElementById("nome").value
+              obj.destinatario = document.getElementById("destino").value
+              obj.mensagem = document.getElementById("texto").value
+
+              socket.send(JSON.stringify(obj))
+              
+              console.log("enviado: "+JSON.stringify(obj))
+
+              document.getElementById("chat").innerHTML+=obj.remetente+": "+ obj.mensagem+"<br>"
+              document.getElementById("texto").value = ""
+            }
+        </script>
+  
+
     </body>
 </html>

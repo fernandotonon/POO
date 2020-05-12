@@ -21,8 +21,8 @@ public class WebSocketServer {
         try {
             String JSONSessoes = sessionManager.sessionsIdToJSON();
         
-            for(Session sessao : sessionManager.getSessoes().values()){
-                    sessao.getBasicRemote().sendText(JSONSessoes);
+            for(MinhaSessao sessao : sessionManager.getSessoes().values()){
+                    sessao.getSessao().getBasicRemote().sendText(JSONSessoes);
             }
         } catch (IOException ex) {
             Logger.getLogger(WebSocketServer.class.getName()).log(Level.SEVERE, null, ex);
@@ -55,6 +55,7 @@ public class WebSocketServer {
             reader.close();
             
             String remetente = pessoaObjeto.getString("remetente");
+            SessionManager.updateNome(session, remetente);
             String destinatario = "";
             if(pessoaObjeto.getJsonString("destinatario")!=null)
                 destinatario = pessoaObjeto.getString("destinatario");
@@ -62,13 +63,14 @@ public class WebSocketServer {
             String mensagem = pessoaObjeto.getString("mensagem");
             
             if(destinatario==null||destinatario.equals("")){
-                for(Session sessao : sessionManager.getSessoes().values()){
-                    if(!sessao.getId().equals(session.getId()))
-                        sessao.getBasicRemote().sendText(mensagem);
+                for(MinhaSessao sessao : sessionManager.getSessoes().values()){
+                    if(!sessao.getSessao().getId().equals(session.getId()))
+                        sessao.getSessao().getBasicRemote().sendText(message);
                 }
             }else{
-                if(sessionManager.getSessoes().containsKey(destinatario))
-                    sessionManager.getSessoes().get(destinatario).getBasicRemote().sendText(mensagem);
+                Session destino = sessionManager.getSessaoDestinatario(destinatario);
+                if(destino!=null)
+                    destino.getBasicRemote().sendText(message);
             }  
             
         } catch (Exception e) {
