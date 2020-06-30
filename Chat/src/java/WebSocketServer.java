@@ -33,7 +33,6 @@ public class WebSocketServer {
     public void onOpen(Session session) {
         System.out.println("onOpen::" + session.getId());  
         sessionManager.addSession(session);
-                
         enviarListaTodos();
     }
     @OnClose
@@ -54,24 +53,38 @@ public class WebSocketServer {
             JsonObject pessoaObjeto = reader.readObject();
             reader.close();
             
-            String remetente = pessoaObjeto.getString("remetente");
-            SessionManager.updateNome(session, remetente);
-            String destinatario = "";
-            if(pessoaObjeto.getJsonString("destinatario")!=null)
-                destinatario = pessoaObjeto.getString("destinatario");
-            
-            String mensagem = pessoaObjeto.getString("mensagem");
-            
-            if(destinatario==null||destinatario.equals("")){
-                for(MinhaSessao sessao : sessionManager.getSessoes().values()){
-                    if(!sessao.getSessao().getId().equals(session.getId()))
-                        sessao.getSessao().getBasicRemote().sendText(message);
-                }
-            }else{
-                Session destino = sessionManager.getSessaoDestinatario(destinatario);
-                if(destino!=null)
-                    destino.getBasicRemote().sendText(message);
-            }  
+            if(pessoaObjeto.containsKey("nome")){
+                Pessoa pessoa;
+                int idade = Integer.valueOf(pessoaObjeto.getString("idade"));
+                if(idade<18)
+                    pessoa = new Crianca();
+                else
+                    pessoa = new Adulto();
+                
+                pessoa.setNome(pessoaObjeto.getString("nome"));
+                pessoa.setIdade(idade);
+                
+                SessionManager.updatePessoa(session, pessoa);
+            }
+            else{
+                String destinatario = "";
+                if(pessoaObjeto.getJsonString("destinatario")!=null)
+                    destinatario = pessoaObjeto.getString("destinatario");
+
+                String mensagem = pessoaObjeto.getString("mensagem");
+                String mensagemEnvio = "{\"remetente\":\""+SessionManager.getSession(session.getId()).getNome()+"\",\"mensagem\":\""+mensagem+"\"}";
+
+                if(destinatario==null||destinatario.equals("")){
+                    for(MinhaSessao sessao : sessionManager.getSessoes().values()){
+                        if(!sessao.getSessao().getId().equals(session.getId()))
+                            sessao.getSessao().getBasicRemote().sendText(mensagemEnvio);
+                    }
+                }else{
+                    Session destino = sessionManager.getSessaoDestinatario(destinatario);
+                    if(destino!=null)
+                        destino.getBasicRemote().sendText(mensagemEnvio);
+                }                  
+            }
             
         } catch (Exception e) {
             e.printStackTrace();

@@ -9,34 +9,22 @@ and open the template in the editor.
         <title>Chat - POO</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     </head>
     <body>
-      <div id="divLogin">
-        Nome:
-        <input id="nome" type="text"/>
-        <br>
-        Idade:
-        <input id="idade" type="text"/>
-        
-        <input id="btentrar" type="button" value="Entrar"/>
-      </div>
-      <div id="divChat" style="visibility: hidden;">
         Destinatário:
         <select id="destino">
             <option></option>
         </select>
         <div id="chat" style="height:300px; overflow:scroll; border:1px solid black"></div>
         <input id="texto" type="text"/>
-        <input id="btenviar" type="button" value="Enviar" />
-      </div>
+        <input id="btenviar" type="button" value="Enviar"/>
+        
         
         <script>
             var socket = new WebSocket("ws://localhost:8080/Chat/endpoint");
             var sessoes = {};
             socket.onopen = function (event) {
-            }
+            };
             socket.onmessage = function (event) {
               console.log("recebeu: "+event.data);
               var obj = JSON.parse(event.data)
@@ -62,20 +50,6 @@ and open the template in the editor.
               console.log("fechado");
             }
 
-            document.getElementById("btentrar").onclick=function enviar(){
-              var obj = {};
-              obj.nome = document.getElementById("nome").value
-              obj.idade = document.getElementById("idade").value
-
-              sessionStorage.setItem('nomeUsuario', obj.nome);
-              sessionStorage.setItem('idadeUsuario', obj.idade);
-
-              socket.send(JSON.stringify(obj))
-
-              document.getElementById("divChat").style.visibility="visible"
-              document.getElementById("divLogin").style.visibility="hidden"
-            }
-
             document.getElementById("btenviar").onclick=function enviar(){
               var obj = {};
               obj.remetente = sessionStorage.getItem('nomeUsuario')
@@ -90,7 +64,6 @@ and open the template in the editor.
               document.getElementById("texto").value = ""
             }
         </script>
-
   
 
     </body>

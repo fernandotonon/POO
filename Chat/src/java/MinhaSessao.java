@@ -13,7 +13,7 @@ import javax.websocket.Session;
  */
 public class MinhaSessao {
     private Session sessao;
-    private String nome;
+    private Pessoa pessoa;
 
     public MinhaSessao(Session sessao) {
         this.sessao = sessao;
@@ -28,11 +28,19 @@ public class MinhaSessao {
     }
 
     public String getNome() {
-        return nome;
+        return this.pessoa.getNome();
     }
 
     public void setNome(String nome) {
-        this.nome = nome;
+        this.pessoa.setNome(nome); 
+    }
+
+    public Pessoa getPessoa() {
+        return pessoa;
+    }
+
+    public void setPessoa(Pessoa pessoa) {
+        this.pessoa = pessoa;
     }
     
     

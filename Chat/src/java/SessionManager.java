@@ -13,6 +13,10 @@ public class SessionManager {
     public static void addSession(Session session) {
         sessoes.put(session.getId(), new MinhaSessao(session));
     }
+    
+    public static MinhaSessao getSession(String id) {
+        return sessoes.get(id);
+    }
 
     public static void removeSession(Session session) {
         sessoes.remove(session.getId());
@@ -30,6 +34,10 @@ public class SessionManager {
     
     public static void updateNome(Session session, String nome){
         sessoes.get(session.getId()).setNome(nome);
+    }
+    
+    public static void updatePessoa(Session session, Pessoa pessoa){
+        sessoes.get(session.getId()).setPessoa(pessoa);
     }
     
     public static Session getSessaoDestinatario(String nome){
